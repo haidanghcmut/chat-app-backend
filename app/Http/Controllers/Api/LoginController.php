@@ -118,7 +118,7 @@ class LoginController extends Controller
 
     return ["code" => 0, "data" => "", "msg" => "success"];
   }
-  
+
   public function contact(Request $request)
   {
     $token = $request->user_token;
@@ -294,7 +294,7 @@ class LoginController extends Controller
   }
   public function send_notice_test()
   {
-    $deviceToken = "d9Zbwl67Ro2IgFm0jFoAlt:APA91bEhU_Ve7o6_aWUt3ex1ML_cyWPMO0t5nHBcLCLFpFkeDQa__akuPL6RciGilpOevgdZDA2Zw6Z1JgZ5746eld9R9nvGH_BWyAnNe7B6q_JK38kbbwnboYdtuxMC7MzpiOysuf40";
+    $deviceToken = "cDxhuwCoQNiGkKKZTTh9te:APA91bF9_E3FpFYZ1Tf_5NSjTd858ANeBDmA0IwpqFv093FaE6kjFI9v15RBc3amgDH018E3QKzNmwsd4hThlv8xUpUSKGTNHPflnbVkKimgeMQUTQ-WyuBFz1luC75mq0kqjK32jiMx";
     $messaging = app('firebase.messaging');
     $message = CloudMessage::fromArray([
       'token' => $deviceToken, // optional
@@ -332,7 +332,6 @@ class LoginController extends Controller
 
     $messaging->send($message);
   }
-
 
   public function upload_photo(Request $request)
   {
