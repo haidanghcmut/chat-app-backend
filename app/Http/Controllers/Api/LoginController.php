@@ -145,151 +145,147 @@ class LoginController extends Controller
     }
 
     $deviceToken = $res->fcmtoken;
-    try {
 
-      if (!empty($deviceToken)) {
+    if (!empty($deviceToken)) {
 
-        $messaging = app('firebase.messaging');
-        if ($call_type == "cancel") {
-          $message = CloudMessage::fromArray([
-            'token' => $deviceToken, // optional
-            'data' => [
-              'token' => $user_token,
-              'avatar' => $user_avatar,
-              'name' => $user_name,
-              'doc_id' => $doc_id,
-              'call_type' => $call_type,
+      $messaging = app('firebase.messaging');
+      if ($call_type == "cancel") {
+        $message = CloudMessage::fromArray([
+          'token' => $deviceToken, // optional
+          'data' => [
+            'token' => $user_token,
+            'avatar' => $user_avatar,
+            'name' => $user_name,
+            'doc_id' => $doc_id,
+            'call_type' => $call_type,
+          ]
+        ]);
+
+        $messaging->send($message);
+      } else if ($call_type == "voice") {
+
+        $message = CloudMessage::fromArray([
+          'token' => $deviceToken, // optional
+          'data' => [
+            'token' => $user_token,
+            'avatar' => $user_avatar,
+            'name' => $user_name,
+            'doc_id' => $doc_id,
+            'call_type' => $call_type,
+          ],
+          'android' => [
+            "priority" => "high",
+            "notification" => [
+              "channel_id" => "com.dbestech.chatty.call",
+              'title' => "Voice call made by " . $user_name,
+              'body' => "Please click to answer the voice call",
             ]
-          ]);
-
-          $messaging->send($message);
-        } else if ($call_type == "voice") {
-
-          $message = CloudMessage::fromArray([
-            'token' => $deviceToken, // optional
-            'data' => [
-              'token' => $user_token,
-              'avatar' => $user_avatar,
-              'name' => $user_name,
-              'doc_id' => $doc_id,
-              'call_type' => $call_type,
+          ],
+          'apns' => [
+            // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
+            'headers' => [
+              'apns-priority' => '10',
             ],
-            'android' => [
-              "priority" => "high",
-              "notification" => [
-                "channel_id" => "com.dbestech.chatty.call",
-                'title' => "Voice call made by " . $user_name,
-                'body' => "Please click to answer the voice call",
-              ]
-            ],
-            'apns' => [
-              // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
-              'headers' => [
-                'apns-priority' => '10',
-              ],
-              'payload' => [
-                'aps' => [
-                  'alert' => [
-                    'title' => "Voice call made by " . $user_name,
-                    'body' => "Please click to answer the video call",
-                  ],
-                  'mutable-content' => 1,
-                  'content-available' => 1,
-                  'badge' => 1,
-                  'sound' => 'task_cancel.caf'
+            'payload' => [
+              'aps' => [
+                'alert' => [
+                  'title' => "Voice call made by " . $user_name,
+                  'body' => "Please click to answer the video call",
                 ],
+                'mutable-content' => 1,
+                'content-available' => 1,
+                'badge' => 1,
+                'sound' => 'task_cancel.caf'
               ],
             ],
-          ]);
+          ],
+        ]);
 
-          $messaging->send($message);
-        } else if ($call_type == "video") {
-          $message = CloudMessage::fromArray([
-            'token' => $deviceToken, // optional
-            'data' => [
-              'token' => $user_token,
-              'avatar' => $user_avatar,
-              'name' => $user_name,
-              'doc_id' => $doc_id,
-              'call_type' => $call_type,
+        $messaging->send($message);
+      } else if ($call_type == "video") {
+        $message = CloudMessage::fromArray([
+          'token' => $deviceToken, // optional
+          'data' => [
+            'token' => $user_token,
+            'avatar' => $user_avatar,
+            'name' => $user_name,
+            'doc_id' => $doc_id,
+            'call_type' => $call_type,
+          ],
+          'android' => [
+            "priority" => "high",
+            "notification" => [
+              "channel_id" => "com.dbestech.chatty.call",
+              'title' => "Video call made by " . $user_name,
+              'body' => "Please click to answer the video call",
+            ]
+          ],
+          'apns' => [
+            // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
+            'headers' => [
+              'apns-priority' => '10',
             ],
-            'android' => [
-              "priority" => "high",
-              "notification" => [
-                "channel_id" => "com.dbestech.chatty.call",
-                'title' => "Video call made by " . $user_name,
-                'body' => "Please click to answer the video call",
-              ]
-            ],
-            'apns' => [
-              // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
-              'headers' => [
-                'apns-priority' => '10',
-              ],
-              'payload' => [
-                'aps' => [
-                  'alert' => [
-                    'title' => "Video call made by " . $user_name,
-                    'body' => "Please click to answer the video call",
-                  ],
-                  'mutable-content' => 1,
-                  'content-available' => 1,
-                  'badge' => 1,
-                  'sound' => 'task_cancel.caf'
+            'payload' => [
+              'aps' => [
+                'alert' => [
+                  'title' => "Video call made by " . $user_name,
+                  'body' => "Please click to answer the video call",
                 ],
+                'mutable-content' => 1,
+                'content-available' => 1,
+                'badge' => 1,
+                'sound' => 'task_cancel.caf'
               ],
             ],
-          ]);
+          ],
+        ]);
 
-          $messaging->send($message);
-        } else if ($call_type == "text") {
+        $messaging->send($message);
+      } else if ($call_type == "text") {
 
-          $message = CloudMessage::fromArray([
-            'token' => $deviceToken, // optional
-            'data' => [
-              'token' => $user_token,
-              'avatar' => $user_avatar,
-              'name' => $user_name,
-              'doc_id' => $doc_id,
-              'call_type' => $call_type,
+        $message = CloudMessage::fromArray([
+          'token' => $deviceToken, // optional
+          'data' => [
+            'token' => $user_token,
+            'avatar' => $user_avatar,
+            'name' => $user_name,
+            'doc_id' => $doc_id,
+            'call_type' => $call_type,
+          ],
+          'android' => [
+            "priority" => "high",
+            "notification" => [
+              "channel_id" => "com.dbestech.chatty.message",
+              'title' => "Message made by " . $user_name,
+              'body' => "Please click to answer the Message",
+            ]
+          ],
+          'apns' => [
+            // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
+            'headers' => [
+              'apns-priority' => '10',
             ],
-            'android' => [
-              "priority" => "high",
-              "notification" => [
-                "channel_id" => "com.dbestech.chatty.message",
-                'title' => "Message made by " . $user_name,
-                'body' => "Please click to answer the Message",
-              ]
-            ],
-            'apns' => [
-              // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#apnsconfig
-              'headers' => [
-                'apns-priority' => '10',
-              ],
-              'payload' => [
-                'aps' => [
-                  'alert' => [
-                    'title' => "Message made by " . $user_name,
-                    'body' => "Please click to answer the Message",
-                  ],
-                  'mutable-content' => 1,
-                  'content-available' => 1,
-                  'badge' => 1,
-                  'sound' => 'ding.caf'
+            'payload' => [
+              'aps' => [
+                'alert' => [
+                  'title' => "Message made by " . $user_name,
+                  'body' => "Please click to answer the Message",
                 ],
+                'mutable-content' => 1,
+                'content-available' => 1,
+                'badge' => 1,
+                'sound' => 'ding.caf'
               ],
             ],
-          ]);
+          ],
+        ]);
 
-          $messaging->send($message);
-        }
-
-        return ["code" => 0, "data" => "", "msg" => "success"];
-      } else {
-        return ["code" => -1, "data" => "", "msg" => "fcmtoken empty"];
+        $messaging->send($message);
       }
-    } catch (\Exception $exception) {
-      return ["code" => -1, "data" => "", "msg" => "Exception"];
+
+      return ["code" => 0, "data" => "", "msg" => "success"];
+    } else {
+      return ["code" => -1, "data" => "", "msg" => "fcmtoken empty"];
     }
   }
   public function send_notice_test()
